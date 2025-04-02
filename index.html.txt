@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Corações Flutuantes - Deslize Funcionando</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #ffe6f2;
+            touch-action: none; /* Importante para desabilitar comportamentos padrão */
+        }
+        
+        .floating-heart {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #ff4081;
+            transform: rotate(45deg);
+            pointer-events: none;
+            animation: float 2s ease-out forwards;
+            z-index: 1000;
+        }
+        
+        .floating-heart::before, 
+        .floating-heart::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: inherit;
+            border-radius: 50%;
+        }
+        
+        .floating-heart::before {
+            top: -15px;
+            left: 0;
+        }
+        
+        .floating-heart::after {
+            top: 0;
+            left: -15px;
+        }
+        
+        @keyframes float {
+            0% {
+                opacity: 1;
+                transform: rotate(45deg) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: rotate(45deg) scale(1.5) translateY(-100px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Variável para controlar a taxa de criação de corações
+            let lastTouchTime = 0;
+            const heartCreationDelay = 50; // ms entre corações
+            
+            // Função para criar corações
+            function createHeart(x, y) {
+                const now = Date.now();
+                if (now - lastTouchTime < heartCreationDelay) return;
+                lastTouchTime = now;
+                
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.style.left = (x - 15) + 'px';
+                heart.style.top = (y - 15) + 'px';
+                
+                // Cor aleatória
+                const colors = ['#ff4081', '#e91e63', '#c2185b', '#ff80ab', '#f50057'];
+                heart.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                document.body.appendChild(heart);
+                
+                // Remover após animação
+                setTimeout(() => heart.remove(), 2000);
+            }
+            
+            // Evento principal para deslize
+            document.body.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0] || e.changedTouches[0];
+                createHeart(touch.clientX, touch.clientY);
+            }, { passive: false });
+            
+            // Evento para toque simples (opcional)
+            document.body.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0] || e.changedTouches[0];
+                createHeart(touch.clientX, touch.clientY);
+            }, { passive: false });
+        });
+    </script>
+</body>
+</html>
